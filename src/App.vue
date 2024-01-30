@@ -5,7 +5,7 @@
 
 <template>
   <div class="navbar bg-base-100">
-    <a class="btn btn-ghost text-xl"> Hello!Projectメンバーの顔識別アプリ・WASM版 </a>
+    <a class="btn btn-ghost text-m md:text-xl"> Hello!Projectメンバーの顔識別アプリ・WASM版 </a>
   </div>
 
   <div class="card bg-secondary-content max-w-xl m-auto">
@@ -24,7 +24,7 @@
   <div class="divider divider-secondary"></div>
   <div class="m-auto flex justify-center gap-4">
     <input type="file" multiple class="file-input file-input-bordered file-input-primary max-w-xs w-full"/>
-    <button class="btn btn-secondary">処理</button>
+    <button class="btn btn-secondary">検出</button>
   </div>
 
   <!--  <HelloWorld msg="Vite + Vue"/>-->
