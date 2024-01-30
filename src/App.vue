@@ -1,11 +1,25 @@
+<!--suppress ES6UnusedImports -->
 <script setup lang="ts">
-// import HelloWorld from './components/HelloWorld.vue'
-// import Inference from './components/Inference.vue';
+
+
+import FileView from "./components/FileView.vue";
+import {ref} from "vue";
+
+let files = ref<Array<File>>([]);
+
+function updateFile() {
+  files.value = [];
+  // document.getElementById("fileList")!.innerHTML="";
+  for (const _file of (document.getElementById("filePicker")! as HTMLInputElement).files!) {
+    console.log(_file)
+    files.value.push(_file)
+  }
+}
 </script>
 
 <template>
   <div class="navbar bg-base-100">
-    <a class="btn btn-ghost text-m md:text-xl"> Hello!Projectメンバーの顔識別アプリ・WASM版 </a>
+    <a class="btn btn-ghost text-lg sm:text-xl"> Hello!Projectメンバーの顔識別アプリ・WASM版 </a>
   </div>
 
   <div class="card bg-secondary-content max-w-xl m-auto">
@@ -23,8 +37,18 @@
   </div>
   <div class="divider divider-secondary"></div>
   <div class="m-auto flex justify-center gap-4">
-    <input type="file" multiple class="file-input file-input-bordered file-input-primary max-w-xs w-full"/>
-    <button class="btn btn-secondary">検出</button>
+    <input type="file" multiple class="file-input file-input-bordered file-input-primary max-w-xs w-full"
+           id="filePicker" @change="updateFile"/>
+    <button class="btn btn-secondary">全て検出</button>
+  </div>
+
+  <div class="divider divider-info"></div>
+
+  <div class="justify-center flex">
+    <div id="fileList"
+         class="carousel carousel-center max-w-[calc(100%-32px)] lg:max-w-[calc(1024px-32px)] p-4 m-4 space-x-4 bg-neutral rounded-box max-h-[50vh]">
+      <FileView v-for="file in files" :file="file"></FileView>
+    </div>
   </div>
 
   <!--  <HelloWorld msg="Vite + Vue"/>-->
