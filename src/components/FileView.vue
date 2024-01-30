@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onBeforeUnmount, onBeforeUpdate, onDeactivated, onMounted, onUnmounted, onUpdated, ref} from "vue";
 
 const props = defineProps<{ file: File }>()
 const imageURI = ref("");
 
-onMounted(() => {
+const displayImage = () => {
+  // if (displayed) return;
+  // if (!imageURI.value) return;
   const reader = new FileReader();
   reader.readAsDataURL(props.file);
+  console.info("mounted: " + props.file.name)
   reader.onload = () => {
     imageURI.value = reader.result! as string;
+    console.info("loaded: " + props.file.name)
   }
+  console.log(imageURI.value)
+}
+onUpdated(() => displayImage())
+onMounted(() => displayImage())
+onBeforeUpdate(() => {
+  // imageURI.value = "";
+  console.info("onBeforeUpdate: " + props.file.name)
+
 })
 
 </script>
@@ -17,7 +29,7 @@ onMounted(() => {
 <template>
   <div class="carousel-item">
     <div class="card card-compact w-96 bg-base-100 shadow-xl">
-      <figure><img :src="imageURI" alt="test 1"/></figure>
+      <figure><img :src="imageURI" :alt="file.name"/></figure>
       <div class="card-body">
         <h2 class="card-title" id="file-name">{{ file.name }}</h2>
         <!--          <p>If a dog chews shoes whose shoes does he choose?</p>-->

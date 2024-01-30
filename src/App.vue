@@ -8,12 +8,14 @@ import {ref} from "vue";
 let files = ref<Array<File>>([]);
 
 function updateFile() {
-  files.value = [];
-  // document.getElementById("fileList")!.innerHTML="";
-  for (const _file of (document.getElementById("filePicker")! as HTMLInputElement).files!) {
-    console.log(_file)
-    files.value.push(_file)
-  }
+  // files.value = [];
+  // // document.getElementById("fileList")!.innerHTML="";
+  // for (const _file of (document.getElementById("filePicker")! as HTMLInputElement).files!) {
+  //   console.log(_file)
+  //   files.value.push(_file)
+  // }
+  files.value = Array.from((document.getElementById("filePicker")! as HTMLInputElement).files!);
+  files.value.map((x) => console.log(x));
 }
 </script>
 
