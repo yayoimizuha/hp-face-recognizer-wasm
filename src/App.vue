@@ -49,7 +49,7 @@ function updateFile() {
   <div class="justify-center flex">
     <div id="fileList"
          class="carousel carousel-center max-w-[calc(100%-32px)] lg:max-w-[calc(1024px-32px)] p-4 m-4 space-x-4 bg-neutral rounded-box max-h-[50vh]">
-      <FileView v-for="file in files" :file="file"></FileView>
+      <FileView v-for="file in files" :file="file"/>
     </div>
   </div>
 

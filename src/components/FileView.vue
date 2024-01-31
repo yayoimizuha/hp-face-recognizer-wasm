@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onBeforeUpdate, onDeactivated, onMounted, onUnmounted, onUpdated, ref} from "vue";
+import { onBeforeUpdate, onMounted, onUpdated, ref} from "vue";
 
 const props = defineProps<{ file: File }>()
 const imageURI = ref("");
@@ -9,18 +9,29 @@ const displayImage = () => {
   // if (!imageURI.value) return;
   const reader = new FileReader();
   reader.readAsDataURL(props.file);
-  console.info("mounted: " + props.file.name)
+  // console.info("mounted: " + props.file.name)
   reader.onload = () => {
     imageURI.value = reader.result! as string;
-    console.info("loaded: " + props.file.name)
+    // console.info("loaded: " + props.file.name)
   }
-  console.log(imageURI.value)
+  // console.log(imageURI.value)
+  const encoded_data = (new TextEncoder()).encode(imageURI.value);
+  crypto.subtle.digest("SHA-256", encoded_data).then((x) => {
+    console.log(Array.from(new Uint8Array(x)).map((b) => b.toString(16).padStart(2, "0")).join(""));
+  });
 }
-onUpdated(() => displayImage())
-onMounted(() => displayImage())
+onUpdated(() => {
+  console.log("onUpdated");
+  displayImage();
+})
+onMounted(() => {
+  console.log("onMounted");
+  displayImage();
+})
+
 onBeforeUpdate(() => {
   // imageURI.value = "";
-  console.info("onBeforeUpdate: " + props.file.name)
+  // console.info("onBeforeUpdate: " + props.file.name)
 
 })
 
