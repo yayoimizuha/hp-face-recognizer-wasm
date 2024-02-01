@@ -1,4 +1,4 @@
-import {InferenceSession} from "onnxruntime-web";
+import {InferenceSession, Tensor} from "onnxruntime-web";
 import {ref} from "vue";
 
 let face_recognition_instance: InferenceSession;
@@ -8,10 +8,11 @@ export let retina_face_load_progress = ref(0.0)
 export let face_recognition_load_progress = ref(0.0)
 
 const sleep = (m_sec: number) => new Promise(resolve => setTimeout(resolve, m_sec))
+export let finish_counter = ref(0);
 
 export async function initModel() {
+    finish_counter.value = 0;
     visible_loader.value = true;
-    let finish_counter = 0;
     fetch("./src/assets/models/face_recognition_sim.onnx").then(async resp => {
         const reader = resp.body!.getReader();
         const total = parseInt(resp.headers.get("Content-Length")!)
@@ -30,11 +31,13 @@ export async function initModel() {
             mergedArray.set(value, modelBuffer.length);
             modelBuffer = mergedArray;
         }
-        face_recognition_instance = await InferenceSession.create(modelBuffer, {
+        InferenceSession.create(modelBuffer, {
             executionProviders: ["wasm"]
+        }).then((session) => {
+            face_recognition_instance = session;
+            finish_counter.value++;
+            if (finish_counter.value == 2) visible_loader.value = false;
         })
-        finish_counter++;
-        if (finish_counter == 2) visible_loader.value = false;
     });
     console.log(FACE_RECOGNITION_HASH)
 
@@ -56,17 +59,26 @@ export async function initModel() {
             mergedArray.set(value, modelBuffer.length);
             modelBuffer = mergedArray;
         }
-        retina_face_instance = await InferenceSession.create(modelBuffer, {
+        InferenceSession.create(modelBuffer, {
             executionProviders: ["wasm"]
+        }).then((session) => {
+            retina_face_instance = session;
+            finish_counter.value++;
+            if (finish_counter.value == 2) visible_loader.value = false;
         })
-
-        finish_counter++;
-        if (finish_counter == 2) visible_loader.value = false;
     });
     console.log(FACE_RECOGNITION_HASH)
 }
 
-export async function inference() {
-
+export async function predictFacePos(img: string) {
+    console.log(img)
+    const picture = await Tensor.fromImage(img, {
+        dataType: "float32",
+        tensorFormat: "RGB",
+        tensorLayout: "NCHW",
+        resizedHeight: 640,
+        resizedWidth: 640
+    });
+    console.log(picture.dims)
 }
 

@@ -44,6 +44,7 @@ function updateFile() {
     <input type="file" multiple class="file-input file-input-bordered file-input-primary max-w-xs w-full"
            id="filePicker" accept="image/*"/>
     <button class="btn btn-secondary" @click="updateFile">画像読み込み</button>
+    <button class="btn btn-secondary" @click="files=[]">画像削除</button>
   </div>
 
   <div class="divider divider-info"></div>
@@ -59,7 +60,7 @@ function updateFile() {
   <div class="divider divider-info"></div>
 
   <div class="justify-center flex">
-    <div id="fileList"
+    <div id="fileList" v-if="files.length != 0"
          class="carousel carousel-center max-w-[calc(100%-32px)] lg:max-w-[calc(1024px-32px)] p-4 m-4 space-x-4 bg-neutral rounded-box max-h-[50vh]">
       <FileView v-for="file in files" :file="file"/>
     </div>

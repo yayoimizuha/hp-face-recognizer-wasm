@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {onBeforeUpdate, onMounted, onUpdated, ref} from "vue";
+import {finish_counter, predictFacePos} from "../inference.ts";
 
 const props = defineProps<{ file: File }>()
 const imageURI = ref("");
@@ -22,8 +23,8 @@ const displayImage = () => {
   });
 }
 onUpdated(() => {
-  // console.log("onUpdated");
-  // displayImage();
+  console.log("onUpdated");
+  displayImage();
 })
 onMounted(() => {
   console.log("onMounted");
@@ -43,10 +44,10 @@ onBeforeUpdate(() => {
     <div class="card card-compact w-96 bg-base-100 shadow-xl">
       <figure><img :src="imageURI" :alt="file.name"/></figure>
       <div class="card-body">
-        <h2 class="card-title" id="file-name">{{ file.name }}</h2>
+        <h2 class="card-title" id="file-name" style="word-break: break-all">{{ file.name }}</h2>
         <!--          <p>If a dog chews shoes whose shoes does he choose?</p>-->
         <div class="card-actions justify-end">
-          <button class="btn btn-primary">検出</button>
+          <button class="btn btn-primary" v-show="finish_counter==2" @click="predictFacePos(imageURI)">検出</button>
         </div>
       </div>
     </div>
