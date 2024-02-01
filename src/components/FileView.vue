@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onBeforeUpdate, onMounted, onUpdated, ref} from "vue";
+import {onBeforeUpdate, onMounted, onUpdated, ref} from "vue";
 
 const props = defineProps<{ file: File }>()
 const imageURI = ref("");
+
 
 const displayImage = () => {
   // if (displayed) return;
@@ -21,8 +22,8 @@ const displayImage = () => {
   });
 }
 onUpdated(() => {
-  console.log("onUpdated");
-  displayImage();
+  // console.log("onUpdated");
+  // displayImage();
 })
 onMounted(() => {
   console.log("onMounted");
