@@ -21,7 +21,7 @@ export default defineConfig(async () => {
             viteStaticCopy({
                 targets: [
                     {
-                        src: "./node_modules/onnxruntime-web/dist/*.wasm",
+                        src: "./node_modules/onnxruntime-web/dist/*.*",
                         dest: "./",
                     }
                 ]

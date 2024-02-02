@@ -60,7 +60,8 @@ export async function initModel() {
             modelBuffer = mergedArray;
         }
         InferenceSession.create(modelBuffer, {
-            executionProviders: ["wasm"]
+            executionProviders: ["wasm"],
+            graphOptimizationLevel: "all",
         }).then((session) => {
             retina_face_instance = session;
             finish_counter.value++;
@@ -70,15 +71,52 @@ export async function initModel() {
     console.log(FACE_RECOGNITION_HASH)
 }
 
+function resize_image(img: string): Promise<string> {
+    const image = document.createElement("img");
+    return new Promise((resolve, reject) => {
+        image.onload = () => {
+            const origImageHeight = image.naturalHeight;
+            const origImageWidth = image.naturalWidth;
+            let imageWidth;
+            let imageHeight;
+            if (origImageWidth > origImageHeight) {
+                imageWidth = 640;
+                imageHeight = 640 * origImageHeight / origImageWidth;
+            } else if (origImageWidth < origImageHeight) {
+                imageHeight = 640;
+                imageWidth = 640 * origImageHeight / origImageWidth;
+            } else {
+                imageHeight = 640;
+                imageWidth = 640;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = 640;
+            const ctx = canvas.getContext("2d")!;
+            ctx.drawImage(image, 0, 0, imageHeight, imageWidth);
+            resolve(canvas.toDataURL())
+        }
+        image.onerror = (error) => reject(error)
+        image.src = img;
+    })
+
+}
+
 export async function predictFacePos(img: string) {
     console.log(img)
-    const picture = await Tensor.fromImage(img, {
+    const resized_image = await resize_image(img);
+    const picture = await Tensor.fromImage(resized_image, {
         dataType: "float32",
-        tensorFormat: "RGB",
+        tensorFormat: "BGR",
         tensorLayout: "NCHW",
-        resizedHeight: 640,
-        resizedWidth: 640
+        height: 640,
+        width: 640,
     });
-    console.log(picture.dims)
+    console.log(picture.dims);
+    const begin = performance.now();
+    const resp = await retina_face_instance.run({input: picture});
+    console.info(`${performance.now() - begin} m_sec`)
+    console.log("bbox", resp["bbox"]["data"])
+    console.log("confidence", resp["confidence"]["data"])
+    console.log("landmark", resp["landmark"]["data"])
 }
 
