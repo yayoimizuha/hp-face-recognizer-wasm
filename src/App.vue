@@ -50,11 +50,14 @@ function updateFile() {
   <div class="divider divider-info"></div>
   <div class="justify-center m-auto flex">
     <div class="flex flex-row gap-4">
-      <div class="flex flex-col gap-4 p-2" v-if="visible_loader">
+      <div class="flex flex-col gap-4 p-2 w-32" v-if="visible_loader">
         <progress class="progress progress-accent join-item" :value="retina_face_load_progress" max="100"/>
         <progress class="progress progress-accent join-item" :value="face_recognition_load_progress" max="100"/>
       </div>
-      <button class="btn btn-secondary" @click="initModel">モデル読み込み</button>
+      <button class="btn btn-secondary" id="model_load_button" @click="initModel">
+        <span class="loading loading-spinner" v-if="visible_loader"></span>
+        <a id="model_load_button_text">モデル読み込み</a>
+      </button>
     </div>
   </div>
   <div class="divider divider-info"></div>
