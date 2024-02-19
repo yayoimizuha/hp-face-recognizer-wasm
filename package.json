@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "wasm": "wasm-pack build ./post_process_wasm --release"
   },
   "dependencies": {
     "vue": "^3.3.11",
@@ -16,6 +17,9 @@
   },
   "devDependencies": {
     "vite-plugin-static-copy": "^1.0.1",
+    "vite-plugin-wasm-pack": "^0.1.12",
+    "vite-plugin-wasm": "^3.3.0",
+    "vite-plugin-top-level-await": "^1.4.1",
     "@vitejs/plugin-vue": "^4.5.2",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",

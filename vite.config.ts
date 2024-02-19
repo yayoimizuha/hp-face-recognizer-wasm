@@ -2,6 +2,9 @@ import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {readFileSync} from "fs";
 import {viteStaticCopy} from "vite-plugin-static-copy";
+import wasmPack from "vite-plugin-wasm-pack";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 async function gen_hash(file_path: string) {
     const file_content = readFileSync(file_path);
@@ -14,7 +17,7 @@ async function gen_hash(file_path: string) {
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => {
-    const retina_face_hash = await gen_hash("./src/assets/models/retinaface_sim.onnx");
+    const retina_face_hash = await gen_hash("./src/assets/models/retinaface_only_nn_sim.onnx");
     const face_recognition_hash = await gen_hash("./src/assets/models/face_recognition_sim.onnx");
     return {
         plugins: [vue(),
@@ -25,7 +28,11 @@ export default defineConfig(async () => {
                         dest: "./",
                     }
                 ]
-            })],
+            }),
+            wasm(),
+            topLevelAwait(),
+            wasmPack("./post_process_wasm"),
+        ],
         define:
             {
                 RETINA_FACE_HASH: retina_face_hash,
