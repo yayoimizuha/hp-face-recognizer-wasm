@@ -68,7 +68,6 @@ function updateFile() {
       <FileView v-for="file in files" :file="file"/>
     </div>
     <div id="canvas_view">
-
     </div>
   </div>
 

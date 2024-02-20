@@ -8,12 +8,18 @@ export let visible_loader = ref(false);
 export let retina_face_load_progress = ref(0.0)
 export let face_recognition_load_progress = ref(0.0)
 
-export let inferenceable = ref(false);
+export let inferable = ref(false);
 
 // const sleep = (m_sec: number) => new Promise(resolve => setTimeout(resolve, m_sec))
 export let finish_counter = ref(0);
 
 const square_size = 640;
+
+export type FacePosInfo = {
+    bbox: number[],
+    score: number,
+    landmarks: number[][]
+}
 
 export async function initModel() {
     const model_load_button = document.getElementById("model_load_button")! as HTMLButtonElement;
@@ -79,14 +85,13 @@ export async function initModel() {
     });
     Promise.all([retina_face_promise, face_recognition_promise]).then(
         () => {
-            inferenceable.value = true;
+            inferable.value = true;
             model_load_button.classList.remove("btn-secondary");
             model_load_button.classList.add("btn-success");
-            document.getElementById("model_load_button_text")!.innerText="読み込み完了";
+            document.getElementById("model_load_button_text")!.innerText = "読み込み完了";
             setTimeout(() => visible_loader.value = false, 1400)
         },
         () => model_load_button.disabled = false
-
     )
 
     console.log(FACE_RECOGNITION_HASH)
@@ -127,7 +132,7 @@ function resize_image(img: string): Promise<[string, number]> {
 
 }
 
-export async function predictFacePos(img: string) {
+export async function predictFacePos(img: string, uid: string) {
     // console.log(img)
     const [resized_image, scale] = await resize_image(img);
     const picture = await Tensor.fromImage(resized_image, {
@@ -141,8 +146,18 @@ export async function predictFacePos(img: string) {
     const begin = performance.now();
     const resp = await retina_face_instance.run({input: picture});
     console.info(`${performance.now() - begin} m_sec`)
-    const faces = await post_process(resp["confidence"]["data"] as Float32Array, resp["bbox"]["data"] as Float32Array, resp["landmark"]["data"] as Float32Array, scale, square_size)
-    console.log(JSON.parse(faces));
-    console.log(face_recognition_instance.inputNames, face_recognition_instance.outputNames)
+    post_process(resp["confidence"]["data"] as Float32Array, resp["bbox"]["data"] as Float32Array, resp["landmark"]["data"] as Float32Array, scale, square_size).then(
+        (post_process_res) => {
+            const faces = JSON.parse(post_process_res) as FacePosInfo[]
+            if (faces.length != 0) {
+                const button_area = document.getElementById(uid)! as HTMLDivElement;
+                button_area.prepend(
+                    new HTMLButtonElement()
+                )
+            }
+            console.log(faces);
+            console.log(face_recognition_instance.inputNames, face_recognition_instance.outputNames)
+        }
+    )
 }
 

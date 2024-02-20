@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {onBeforeUpdate, onMounted, onUpdated, ref} from "vue";
-import {inferenceable, predictFacePos} from "../inference.ts";
+import {inferable, predictFacePos} from "../inference.ts";
 
 const props = defineProps<{ file: File }>()
 const imageURI = ref("");
-
+const uid = ref("")
 
 const displayImage = () => {
   // if (displayed) return;
@@ -19,7 +19,8 @@ const displayImage = () => {
   // console.log(imageURI.value)
   const encoded_data = (new TextEncoder()).encode(imageURI.value);
   crypto.subtle.digest("SHA-256", encoded_data).then((x) => {
-    console.log(Array.from(new Uint8Array(x)).map((b) => b.toString(16).padStart(2, "0")).join(""));
+    uid.value = Array.from(new Uint8Array(x)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    console.log(uid.value);
   });
 }
 onUpdated(() => {
@@ -46,8 +47,9 @@ onBeforeUpdate(() => {
       <div class="card-body">
         <h2 class="card-title" id="file-name" style="word-break: break-all">{{ file.name }}</h2>
         <!--          <p>If a dog chews shoes whose shoes does he choose?</p>-->
-        <div class="card-actions justify-end">
-          <button class="btn btn-primary" v-if="inferenceable" @click="predictFacePos(imageURI)">検出</button>
+        <div class="card-actions justify-end" :id="uid">
+          <button class="btn btn-primary" v-if="inferable" @click="predictFacePos(imageURI,uid)">検出
+          </button>
         </div>
       </div>
     </div>
