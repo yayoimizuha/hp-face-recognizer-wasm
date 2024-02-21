@@ -15,6 +15,7 @@ function updateFile() {
   //   console.log(_file)
   //   files.value.push(_file)
   // }
+  files.value = []
   files.value = Array.from((document.getElementById("filePicker")! as HTMLInputElement).files!);
   files.value.map((x) => console.log(x));
 }

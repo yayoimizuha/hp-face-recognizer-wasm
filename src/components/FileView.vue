@@ -52,7 +52,7 @@ const predict_face_pos = async () => {
   )
 }
 
-const showModal = ref(false);
+// const showModal = ref(false);
 
 const run_modal = () => {
   eval("_" + uid.value + ".showModal()");
@@ -68,12 +68,11 @@ const run_modal = () => {
         <div class="card-actions justify-end" :id="uid+'-card'">
           <!--          <a class="btn btn-success " :id="uid+'-view-face-pos'" @click="showModal=true" :href="'#'+uid">view</a>-->
           <button class="btn btn-success" :id="uid+'-view-face-pos'" :disabled="faces.length==0"
-                  @click="run_modal">view
+                  @click="run_modal">検出した顔を表示 ({{ faces.length }})
           </button>
           <FaceView :image_uri="imageURI" :faces="faces" :uid="uid"/>
 
-          <button class="btn btn-primary" v-if="inferable" @click="predict_face_pos">検出
-          </button>
+          <button class="btn btn-primary" v-if="inferable" @click="predict_face_pos">検出</button>
         </div>
       </div>
     </div>
