@@ -13,7 +13,7 @@ export let inferable = ref(false);
 // const sleep = (m_sec: number) => new Promise(resolve => setTimeout(resolve, m_sec))
 export let finish_counter = ref(0);
 
-const square_size = 640;
+// const square_size = 1024;
 
 
 export type FacePosInfo = {
@@ -100,34 +100,36 @@ export async function initModel() {
     console.log(FACE_RECOGNITION_HASH)
 }
 
-function resize_image(img: string): Promise<[string, number]> {
+function resize_image(img: string): Promise<[string, number, number]> {
     const image = document.createElement("img");
     return new Promise((resolve, reject) => {
         image.onload = () => {
             const origImageHeight = image.naturalHeight;
             const origImageWidth = image.naturalWidth;
-            let imageWidth;
-            let imageHeight;
-            let scale;
-            if (origImageWidth > origImageHeight) {
-                imageHeight = square_size;
-                imageWidth = square_size * origImageHeight / origImageWidth;
-                scale = origImageHeight / square_size;
-            } else if (origImageWidth < origImageHeight) {
-                imageWidth = square_size;
-                imageHeight = square_size * origImageWidth / origImageHeight;
-                scale = origImageWidth / square_size;
-            } else {
-                imageHeight = square_size;
-                imageWidth = square_size;
-                scale = origImageHeight / square_size;
-            }
+            // let imageWidth;
+            // let imageHeight;
+            // let scale = 1;
+            // if (origImageWidth > origImageHeight) {
+            //     imageHeight = square_size;
+            //     imageWidth = square_size * origImageHeight / origImageWidth;
+            //     scale = origImageWidth / square_size;
+            // } else if (origImageWidth < origImageHeight) {
+            //     imageWidth = square_size;
+            //     imageHeight = square_size * origImageWidth / origImageHeight;
+            //     scale = origImageHeight / square_size;
+            // } else {
+            //     imageHeight = square_size;
+            //     imageWidth = square_size;
+            //     scale = origImageHeight / square_size;
+            // }
+            // console.log("scale :", 100 / scale, "%");
             const canvas = document.createElement('canvas');
             // document.getElementById("canvas_view")!.appendChild(canvas);
-            canvas.width = canvas.height = square_size;
+            canvas.width = origImageWidth;
+            canvas.height = origImageHeight;
             const ctx = canvas.getContext("2d")!;
-            ctx.drawImage(image, 0, 0, imageHeight, imageWidth);
-            resolve([canvas.toDataURL(), scale])
+            ctx.drawImage(image, 0, 0, origImageWidth, origImageHeight);
+            resolve([canvas.toDataURL(), origImageHeight, origImageWidth])
         }
         image.onerror = (error) => reject(error)
         image.src = img;
@@ -137,13 +139,13 @@ function resize_image(img: string): Promise<[string, number]> {
 
 export async function predictFacePos(img: string): Promise<FacePosInfo[]> {
     // console.log(img)
-    const [resized_image, scale] = await resize_image(img);
+    const [resized_image, height, width] = await resize_image(img);
     const picture = await Tensor.fromImage(resized_image, {
         dataType: "float32",
         tensorFormat: "RGB",
         tensorLayout: "NCHW",
-        height: square_size,
-        width: square_size,
+        height: height,
+        width: width,
     }) as TypedTensor<"float32">;
     console.log(picture.dims);
     const begin = performance.now();
@@ -151,7 +153,7 @@ export async function predictFacePos(img: string): Promise<FacePosInfo[]> {
     const elapsed = performance.now() - begin;
     console.info(`${elapsed} m_sec`)
     return new Promise(async (resolve, _) => {
-        const post_process_res = post_process(resp["confidence"]["data"] as Float32Array, resp["bbox"]["data"] as Float32Array, resp["landmark"]["data"] as Float32Array, scale, square_size);
+        const post_process_res = post_process(resp["confidence"]["data"] as Float32Array, resp["bbox"]["data"] as Float32Array, resp["landmark"]["data"] as Float32Array, 1, height, width);
         const faces = JSON.parse(await post_process_res) as FacePosInfo[]
 
         if (faces.length != 0) {
