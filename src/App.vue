@@ -19,6 +19,7 @@ function updateFile() {
   files.value.map((x) => console.log(x));
 }
 
+const clearFile = () => files.value = []
 </script>
 
 <template>
@@ -44,7 +45,7 @@ function updateFile() {
     <input type="file" multiple class="file-input file-input-bordered file-input-primary max-w-xs w-full"
            id="filePicker" accept="image/*"/>
     <button class="btn btn-secondary" @click="updateFile">画像読み込み</button>
-    <button class="btn btn-secondary" @click="files=[]">画像削除</button>
+    <button class="btn btn-secondary" @click="clearFile">画像削除</button>
   </div>
 
   <div class="divider divider-info"></div>

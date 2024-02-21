@@ -92,15 +92,15 @@ pub async fn post_process(_confidence: Box<[f32]>, _loc: Box<[f32]>, _landmark: 
     );
     let extract = |tensor: Box<[f32]>, width: usize| <Array<f32, Ix3>>::from_shape_vec((1usize, onnx_output_width, width), Vec::from(tensor)).unwrap();
 
-    let mut confidence = extract(_confidence, 2);
+    let confidence = extract(_confidence, 2);
     let loc = extract(_loc, 4);
     let landmark = extract(_landmark, 10);
 
-    let _ = confidence.axis_iter_mut(Axis(1)).map(|mut x| {
-        let row_sum = x.mapv(|e| e.exp()).sum();
-        x.mapv_inplace(|x| x.exp() / row_sum);
-        ()
-    }).collect::<Vec<_>>();
+    // let _ = confidence.axis_iter_mut(Axis(1)).map(|mut x| {
+    //     let row_sum = x.mapv(|e| e.exp()).sum();
+    //     x.mapv_inplace(|x| x.exp() / row_sum);
+    //     ()
+    // }).collect::<Vec<_>>();
 
     let mut boxes = decode(loc.slice(s![0,..,..]).to_owned(), prior_box.clone(), variance);
     boxes = boxes * scale_bboxes;
